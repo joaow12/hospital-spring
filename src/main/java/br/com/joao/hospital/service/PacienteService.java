@@ -11,6 +11,7 @@ import br.com.joao.hospital.entity.Consultas;
 import br.com.joao.hospital.entity.Medicos;
 import br.com.joao.hospital.entity.Pacientes;
 import br.com.joao.hospital.form.PacienteForm;
+import br.com.joao.hospital.repository.MedicoRepository;
 import br.com.joao.hospital.repository.PacienteRepository;
 import br.com.joao.hospital.vo.ConsultaVO;
 import br.com.joao.hospital.vo.MedicoVO;
@@ -18,14 +19,21 @@ import br.com.joao.hospital.vo.PacienteVO;
 
 @Service
 public class PacienteService {
-	
+
 	@Autowired
 	private PacienteRepository repository;
 	
-	public Page<PacienteVO> buscarTodosPacientes(Pageable page){
+	@Autowired
+	private MedicoRepository medicoRepository;
+
+	public Page<PacienteVO> buscarTodosPacientes(Pageable page) {
 		return repository.findAll(page).map(this::converterPacienteEntityParaVO);
 	}
 	
+	public Page<MedicoVO> buscarTodosMedicos(Pageable page){
+		return medicoRepository.findAll(page).map(this::converterMedicoEntityParaVO);
+	}
+
 	public PacienteVO converterPacienteEntityParaVO(Pacientes paciente) {
 		PacienteVO vo = new PacienteVO();
 		vo.setCpf(paciente.getCpf());
@@ -34,7 +42,7 @@ public class PacienteService {
 		vo.setConsultas(paciente.getConsultas().stream().map(this::converterConsultaEntityParaVO).toList());
 		return vo;
 	}
-	
+
 	private ConsultaVO converterConsultaEntityParaVO(Consultas c) {
 		ConsultaVO vo = new ConsultaVO();
 		vo.setDataConsulta(c.getDataConsulta());
@@ -44,8 +52,8 @@ public class PacienteService {
 		vo.setPaciente(converterPacienteEntityParaVO(c.getPaciente()));
 		return vo;
 	}
-	
-	private MedicoVO converterMedicoEntityParaVO(Medicos m) {
+
+	public MedicoVO converterMedicoEntityParaVO(Medicos m) {
 		MedicoVO vo = new MedicoVO();
 		vo.setCodf(m.getCodf());
 		vo.setNome(m.getNome());
@@ -53,17 +61,20 @@ public class PacienteService {
 		vo.setConsultas(m.getConsultas().stream().map(this::converterConsultaEntityParaVO).toList());
 		return vo;
 	}
-	
-	public PacienteVO atualizarCadastro(PacienteForm form, String cpf) {
+
+	public Pacientes atualizarCadastro(PacienteForm form, String cpf) {
 		Optional<Pacientes> p = repository.findByCpf(cpf);
-		if(p.isPresent()) {
+		if (p.isPresent()) {
 			p.get().setNome(form.getNome());
 			p.get().setCpf(form.getCpf());
 			p.get().setDataNascimento(form.getDataNascimento());
-			repository.save(p.get());
-			return converterPacienteEntityParaVO(p.get());
+			return p.get();
 		}
-		return converterPacienteEntityParaVO(p.get());
-		
+		return null;
+
+	}
+
+	public void deletar(Integer id) {
+		repository.deleteById(id);
 	}
 }

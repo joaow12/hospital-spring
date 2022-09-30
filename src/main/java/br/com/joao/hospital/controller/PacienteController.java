@@ -1,7 +1,9 @@
 package br.com.joao.hospital.controller;
 
 import java.util.List;
+import java.util.Optional;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +49,8 @@ public class PacienteController {
 	}
 
 	@GetMapping("/nome/{nome}")
-	public ResponseEntity<List<Pacientes>> buscarPorNome(@PathVariable String nome) {
-		return ResponseEntity.ok(repository.findByNome(nome));
+	public ResponseEntity<List<PacienteVO>> buscarPorNome(@PathVariable String nome) {
+		return ResponseEntity.ok(repository.findByNome(nome).stream().map(p -> service.converterPacienteEntityParaVO(p)).toList());
 	}
 
 	@PostMapping
@@ -56,15 +58,20 @@ public class PacienteController {
 		return ResponseEntity.ok(repository.save(pacientes));
 	}
 
-	@PutMapping("/{cpf}")
-	public ResponseEntity<PacienteVO> atualizar(@PathVariable String cpf, @RequestBody @Valid PacienteForm paciente) {
-		service.atualizarCadastro(paciente, cpf);
-		return repository.findByCpf(cpf).map(p -> ResponseEntity.ok(service.converterPacienteEntityParaVO(p)))
-				.orElse(ResponseEntity.notFound().build());
+	@PutMapping("/{id}")
+	@Transactional
+	public ResponseEntity<PacienteVO> atualizar(@PathVariable Integer id, @RequestBody @Valid PacienteForm paciente) {
+		Optional<Pacientes> p = repository.findById(id);
+		if(p.isPresent()) {
+			Pacientes pac = paciente.converter(id, repository);
+			return ResponseEntity.ok(new PacienteVO(pac));
+		}
+		return ResponseEntity.notFound().build();
 	}
 
-	@DeleteMapping("/{cpf}")
-	public ResponseEntity<HttpStatus> deletar(@PathVariable String cpf) {
+	@DeleteMapping("/{id}")
+	public ResponseEntity<HttpStatus> deletar(@PathVariable Integer id) {
+		service.deletar(id);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 
