@@ -1,6 +1,7 @@
-FROM openjdk:11-jdk
-MAINTAINER Julio Santos
+FROM openjdk:8-jdk-alpine
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
 WORKDIR /app
-COPY target/integracao-continua-0.0.1.jar /app/app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
