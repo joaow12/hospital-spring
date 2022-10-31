@@ -4,5 +4,5 @@ ADD ./target/${JAR_FILE} app.jar
 USER spring:spring
 WORKDIR /app
 ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+COPY ${JAR_FILE} /app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
