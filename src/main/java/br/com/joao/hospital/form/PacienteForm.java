@@ -2,6 +2,7 @@ package br.com.joao.hospital.form;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -47,7 +48,7 @@ public class PacienteForm {
 		this.dataNascimento = dataNascimento;
 	}
 
-	public Pacientes converter(Integer id, PacienteRepository repository) {
+	public Pacientes converter(UUID id, PacienteRepository repository) {
 		Optional<Pacientes> p = repository.findById(id);
 		
 		p.get().setNome(this.nome);

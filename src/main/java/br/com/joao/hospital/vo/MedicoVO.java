@@ -2,6 +2,7 @@ package br.com.joao.hospital.vo;
 
 import java.util.List;
 
+import br.com.joao.hospital.entity.Medicos;
 import br.com.joao.hospital.enums.Especialidade;
 
 public class MedicoVO {
@@ -10,6 +11,15 @@ public class MedicoVO {
 	private String nome;
 	private Especialidade especialidade;
 	private List<ConsultaVO> consultas;
+	
+	public MedicoVO() {
+	}
+
+	public MedicoVO(Medicos med) {
+		this.codf = med.getCodf();
+		this.nome = med.getNome();
+		this.especialidade = med.getEspecialidade();
+	}
 
 	public Integer getCodf() {
 		return codf;

@@ -1,8 +1,13 @@
 package br.com.joao.hospital.form;
 
+import java.util.Optional;
+
 import javax.validation.constraints.NotBlank;
 
+import br.com.joao.hospital.entity.Medicos;
+import br.com.joao.hospital.entity.Pacientes;
 import br.com.joao.hospital.enums.Especialidade;
+import br.com.joao.hospital.repository.MedicoRepository;
 
 public class MedicoForm {
 
@@ -37,6 +42,16 @@ public class MedicoForm {
 
 	public void setEspecialidade(Especialidade especialidade) {
 		this.especialidade = especialidade;
+	}
+
+	public Medicos converter(Integer id, MedicoRepository repository) {
+		Optional<Medicos> m = repository.findById(id);
+
+		m.get().setNome(this.nome);
+		m.get().setCodf(this.codf);
+		m.get().setEspecialidade(this.especialidade);
+
+		return m.get();
 	}
 
 }

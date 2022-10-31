@@ -1,7 +1,9 @@
 package br.com.joao.hospital.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,11 +17,13 @@ import javax.validation.constraints.NotBlank;
 import br.com.joao.hospital.enums.StatusConsulta;
 
 @Entity(name = "tb_consultas")
-public class Consultas {
+public class Consultas implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private UUID id;
 
 	@NotBlank
 	private LocalDate dataConsulta;
@@ -36,11 +40,11 @@ public class Consultas {
 	@ManyToOne
 	private Pacientes paciente;
 
-	public Integer getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

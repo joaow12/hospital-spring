@@ -1,5 +1,6 @@
 package br.com.joao.hospital.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +17,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity(name = "tb_paciente")
-public class Pacientes {
+public class Pacientes implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private UUID id;
 
 	@NotBlank
 	private String nome;
@@ -35,11 +38,11 @@ public class Pacientes {
 	@OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
 	private List<Consultas> consultas = new ArrayList<>();
 
-	public Integer getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

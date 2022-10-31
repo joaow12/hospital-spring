@@ -1,6 +1,7 @@
 package br.com.joao.hospital.service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import br.com.joao.hospital.entity.Consultas;
 import br.com.joao.hospital.entity.Medicos;
 import br.com.joao.hospital.entity.Pacientes;
 import br.com.joao.hospital.form.PacienteForm;
+import br.com.joao.hospital.repository.ConsultaRepository;
 import br.com.joao.hospital.repository.MedicoRepository;
 import br.com.joao.hospital.repository.PacienteRepository;
 import br.com.joao.hospital.vo.ConsultaVO;
@@ -22,19 +24,38 @@ public class PacienteService {
 
 	@Autowired
 	private PacienteRepository repository;
-	
+
+	@Autowired
+	private ConsultaRepository consultaRepository;
+
 	@Autowired
 	private MedicoRepository medicoRepository;
 
 	public Page<PacienteVO> buscarTodosPacientes(Pageable page) {
 		return repository.findAll(page).map(this::converterPacienteEntityParaVO);
 	}
-	
-	public Page<MedicoVO> buscarTodosMedicos(Pageable page){
+
+	public Page<ConsultaVO> buscarTodasConsultas(Pageable page) {
+		return consultaRepository.findAll(page).map(this::converterConsultaEntityParaVO);
+	}
+
+	public Page<MedicoVO> buscarTodosMedicos(Pageable page) {
 		return medicoRepository.findAll(page).map(this::converterMedicoEntityParaVO);
 	}
 
-	public PacienteVO converterPacienteEntityParaVO(Pacientes paciente) {
+	public PacienteVO mostrarPacienteVO(Pacientes p) {
+		return converterPacienteEntityParaVO(p);
+	}
+	
+	public MedicoVO mostrarMedicoVO(Medicos m) {
+		return converterMedicoEntityParaVO(m);
+	}
+	
+	public ConsultaVO mostrarConsultaVO(Consultas c) {
+		return converterConsultaEntityParaVO(c);
+	}
+
+	private PacienteVO converterPacienteEntityParaVO(Pacientes paciente) {
 		PacienteVO vo = new PacienteVO();
 		vo.setCpf(paciente.getCpf());
 		vo.setNome(paciente.getNome());
@@ -52,8 +73,8 @@ public class PacienteService {
 		vo.setPaciente(converterPacienteEntityParaVO(c.getPaciente()));
 		return vo;
 	}
-
-	public MedicoVO converterMedicoEntityParaVO(Medicos m) {
+	
+	private MedicoVO converterMedicoEntityParaVO(Medicos m) {
 		MedicoVO vo = new MedicoVO();
 		vo.setCodf(m.getCodf());
 		vo.setNome(m.getNome());
@@ -74,7 +95,12 @@ public class PacienteService {
 
 	}
 
-	public void deletar(Integer id) {
+	public void deletarPaciente(UUID id) {
 		repository.deleteById(id);
 	}
+
+	public void deletarConsulta(UUID id) {
+		repository.deleteById(id);
+	}
+
 }

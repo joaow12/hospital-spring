@@ -2,6 +2,7 @@ package br.com.joao.hospital.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -41,16 +42,25 @@ public class PacienteController {
 	public ResponseEntity<Page<PacienteVO>> mostrarTodos(@PageableDefault(size = 5) Pageable page) {
 		return ResponseEntity.ok(service.buscarTodosPacientes(page));
 	}
+	
+	@GetMapping("/id/{id}")
+	public ResponseEntity<Pacientes> buscarPorId(@PathVariable UUID id){
+		Optional<Pacientes> p = repository.findById(id);
+		if(!p.isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(p.get());
+	}
 
 	@GetMapping("/{cpf}")
 	public ResponseEntity<PacienteVO> buscarPorCPF(@PathVariable String cpf) {
-		return repository.findByCpf(cpf).map(p -> ResponseEntity.ok(service.converterPacienteEntityParaVO(p)))
+		return repository.findByCpf(cpf).map(p -> ResponseEntity.ok(service.mostrarPacienteVO(p)))
 				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@GetMapping("/nome/{nome}")
 	public ResponseEntity<List<PacienteVO>> buscarPorNome(@PathVariable String nome) {
-		return ResponseEntity.ok(repository.findByNome(nome).stream().map(p -> service.converterPacienteEntityParaVO(p)).toList());
+		return ResponseEntity.ok(repository.findByNome(nome).stream().map(p -> service.mostrarPacienteVO(p)).toList());
 	}
 
 	@PostMapping
@@ -60,7 +70,7 @@ public class PacienteController {
 
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<PacienteVO> atualizar(@PathVariable Integer id, @RequestBody @Valid PacienteForm paciente) {
+	public ResponseEntity<PacienteVO> atualizar(@PathVariable UUID id, @RequestBody @Valid PacienteForm paciente) {
 		Optional<Pacientes> p = repository.findById(id);
 		if(p.isPresent()) {
 			Pacientes pac = paciente.converter(id, repository);
@@ -70,8 +80,8 @@ public class PacienteController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<HttpStatus> deletar(@PathVariable Integer id) {
-		service.deletar(id);
+	public ResponseEntity<HttpStatus> deletar(@PathVariable UUID id) {
+		service.deletarPaciente(id);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 
